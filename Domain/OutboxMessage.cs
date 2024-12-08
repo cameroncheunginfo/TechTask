@@ -1,9 +1,9 @@
 ﻿namespace Domain;
 
+// This will need a status property to track if the message has been processed
 public class OutboxMessage
 {
-    private OutboxMessage() {}
-
+    private OutboxMessage() { }
     public OutboxMessage(string payloadJson)
     {
 
