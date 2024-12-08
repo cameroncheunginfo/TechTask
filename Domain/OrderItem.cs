@@ -2,12 +2,14 @@
 
 public class OrderItem
 {
-    private OrderItem() {}
+    private OrderItem() { }
 
     public OrderItem(Order order,
                      Variant variant,
                      int quantity)
     {
+        // Validate against negative quantity
+
         OrderId = order.OrderId;
         Order = order;
 

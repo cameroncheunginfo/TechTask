@@ -33,10 +33,19 @@ public class OrderCreator(
 
     public OrderDto CreateOrder(CreateOrderRequestDto request)
     {
+        // Potentially use a DB transaction through the UnitOfWork
+
         var customer = customerProvider.GetCustomer(request.Customer);
         var addresses = addressProvider.GetAddresses(request.Customer.BillingAddress,
                                                      request.Customer.ShippingAddress);
 
+        // Missing validation for <= 0 quantity and empty SKU on CreateOrderItemDto.
+        // Not sure if you need to have validation that all SKUs are unique.
+        // I would just pass the entire CreateOrderRequestDto object into the validator.
+
+        /* This validation for the customer and address happens AFTER trying to get/create them from the DB. Better to move this to the very top of this method
+         * and validate the request instead of what we get from the database.
+         */
         if (!requestValidator.TryValidate(customer, addresses.Item1, addresses.Item2, out var errors))
             throw new ValidationException("Validation failed", errors);
 
@@ -49,6 +58,10 @@ public class OrderCreator(
         var products = GetProducts(request.OrderItems);
 
         order.UpdateItems(products);
+
+        /* If we're suppose to be using the transactional outbox pattern then 
+         * this line needs to be remove so that the outbox message is created in the same transaction
+         */
         _unitOfWork.Save();
 
         var outboxMessage = outboxMessageCreator.Create<Order>(order);
@@ -67,10 +80,15 @@ public class OrderCreator(
         var variants = new HashSet<Variant>();
         foreach (var item in items)
         {
+            // This is doing a DB request for each item in the collection, would be better moving outside of the for loop and using a dictionary
             var variant = variantRepo.Get(x => x.Sku == item.Sku)
                                      .Include(i => i.Product)
-                                     .Single();
-            variants.Add(variant);
+                                     .SingleOrDefault();
+
+            if (variant is not null)
+            {
+                variants.Add(variant);
+            }
         }
 
         var requestedSkus = items.Select(x => x.Sku);

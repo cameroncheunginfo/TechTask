@@ -5,7 +5,7 @@ namespace Domain;
 
 public class Address
 {
-    private Address() {}
+    private Address() { }
 
     public Address(string lineOne,
                    string lineTwo,
@@ -31,6 +31,7 @@ public class Address
     public ICollection<Order> BillingOrders { get; private set; }
     public ICollection<Order> ShippingOrders { get; private set; }
 
+    // Needs to account for casing?
     public static Guid GenerateAddressHash(string lineOne,
                                            string lineTwo,
                                            string lineThree,
@@ -50,6 +51,7 @@ public class Address
                          string lineThree,
                          string postCode)
     {
+        // This needs to update the hash
         LineOne = lineOne;
         LineTwo = lineTwo;
         LineThree = lineThree;

@@ -13,7 +13,7 @@ public class Order
     public Order(Customer customer,
                  Address shippingAddress,
                  Address billingAddress)
-        : this() 
+        : this()
     {
         CustomerId = customer.CustomerId;
         Customer = customer;
@@ -61,16 +61,21 @@ public class Order
         return $"ORD-{Created.Year % 1000}{Created.Month}-{hashGuid.GetHashCode()}";
     }
 
+    /* This method could benefit from a XML comment, because 
+     * just looking at the method signature, it's not clear what the int is for. */
     public void UpdateItems(IDictionary<Variant, int> orderItems)
     {
+        // validation against negative quantities?
+
         var orderedItems = orderItems.Select(x => new OrderItem(this,
                                                                 x.Key,
                                                                 x.Value))
-                                     .ToList();
+                                     .ToList(); // General styling issues
 
-        foreach(var item in orderedItems)
+        foreach (var item in orderedItems)
             OrderItems.Add(item);
 
+        // This can just be "orderItems.Sum(x => x.Key.Price * x.Value);"
         TotalPrice = orderItems.Select(x => x.Key.Price * x.Value).Sum();
     }
 

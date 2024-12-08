@@ -26,7 +26,7 @@ public class OrderDtoMapper : IOrderDtoMapper
                 AddressLineThree = order.ShippingAddress.LineThree,
                 PostCode = order.ShippingAddress.PostCode,
             },
-            TotalCost = order.OrderItems.Sum(x => x.Quantity * x.Variant.Price),
+            TotalCost = order.OrderItems.Sum(x => x.Quantity * x.Variant.Price), // TotalPrice already exists on the Order model
             OrderItems = order.OrderItems.Select(x => new OrderItemDto
             {
                 ProductId = x.Variant.Product.ProductId,
